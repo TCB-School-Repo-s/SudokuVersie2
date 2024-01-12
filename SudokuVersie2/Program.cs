@@ -1,19 +1,36 @@
-﻿namespace SudokuVersie2
+﻿using System.Diagnostics;
+
+namespace SudokuVersie2
 {
     internal class Program
     {
         static void Main(string[] args)
         {
-            ChronologicalBacktracker sud = ChronologicalBacktracker.FromString("0 0 3 0 2 0 6 0 0 9 0 0 3 0 5 0 0 1 0 0 1 8 0 6 4 0 0 0 0 8 1 0 2 9 0 0 7 0 0 0 0 0 0 0 8 0 0 6 7 0 8 2 0 0 0 0 2 6 0 9 5 0 0 8 0 0 2 0 3 0 0 9 0 0 5 0 1 0 3 0 0");
+
+            Stopwatch stopwatch = new Stopwatch();
+
+            Console.WriteLine("Hi, I am your Sudoku Solver Assistant! Please input your sudoku, make sure the numbers are seperated by spaces and there are no spaces in front or after the string: ");
+            string sudoku = Console.ReadLine();
+
+            ChronologicalBacktracker sud = ChronologicalBacktracker.FromString(sudoku);
+
+            Console.WriteLine("This is your current sudoku input:");
+            sud.Print();
+
+            Console.WriteLine("I will now attempt to solve the sudoku...");
+            stopwatch.Start();
 
             bool hey = sud.SolveSudoku();
             if (hey)
             {
+                stopwatch.Stop();
+                Console.WriteLine($"I have found a solution! It took me: {stopwatch.ElapsedMilliseconds}ms");
                 sud.Print();
             }
             else
             {
-                Console.WriteLine("oops");
+                stopwatch.Stop();
+                Console.WriteLine("I am very sorry, the sudoku appears to not be solveable :(");
             }
 
         }
