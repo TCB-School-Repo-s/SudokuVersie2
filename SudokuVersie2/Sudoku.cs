@@ -7,16 +7,15 @@ using System.Threading.Tasks;
 
 namespace SudokuVersie2
 {
-    internal class Sudoku
+    public abstract class SudokuSolver
     {
 
-        private (int, Boolean)[,] puzzle = new (int, Boolean)[9, 9];
-        private int timeTaken = 0;
+        protected (int, Boolean)[,] puzzle = new (int, Boolean)[9, 9];
 
-        public Sudoku(int[,] puzzle)
+        /*public SudokuSolver((int, Boolean)[,] puzzle)
         {
-            puzzle = puzzle;
-        }
+            this.puzzle = puzzle;
+        }*/
 
 
         public (int, Boolean)[,] Puzzle
@@ -24,12 +23,9 @@ namespace SudokuVersie2
             get { return puzzle; }
         }
 
+        public abstract void SolveSudoku();
 
-        //// <summary>
-        /// Method <c>FromString</c> generates a sudoku object from a string.
-        /// </summary>
-        /// <param name="str">The string to generate sudoku from</param>
-        /// <returns>Sudoku object</returns>
+        /*
         public static Sudoku FromString(string str)
         {
             Sudoku sudoku = new Sudoku(new int[9, 9]);
@@ -50,7 +46,8 @@ namespace SudokuVersie2
             }
 
             return sudoku;
-        }
+        }*/
+
 
         // prints the entire sudoku with axis to help determine where potential issues were.
         public void Print()

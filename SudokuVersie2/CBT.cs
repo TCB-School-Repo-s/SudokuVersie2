@@ -9,7 +9,7 @@ namespace SudokuVersie2
     internal class CBT
     {
 
-        private Sudoku sud;
+        /*private Sudoku sud;
         private (int, int) currentCell;
 
         public CBT(Sudoku sud)
@@ -72,7 +72,7 @@ namespace SudokuVersie2
 
             return true;
         }
-
+        */
 
     }
 }
