@@ -12,44 +12,17 @@ namespace SudokuVersie2
 
         protected (int, Boolean)[,] puzzle = new (int, Boolean)[9, 9];
 
-        /*public SudokuSolver((int, Boolean)[,] puzzle)
-        {
-            this.puzzle = puzzle;
-        }*/
-
-
         public (int, Boolean)[,] Puzzle
         {
             get { return puzzle; }
         }
 
-        public abstract void SolveSudoku();
-
-        /*
-        public static Sudoku FromString(string str)
-        {
-            Sudoku sudoku = new Sudoku(new int[9, 9]);
-
-            string[] values = str.Split(' ');
-            int index = 0;
-
-            // fill in the numbers in each row, and add a bool to show whether it is a fixed or swappable number.
-            for (int i = 0; i < 9; i++)
-            {
-                for (int j = 0; j < 9; j++)
-                {
-                    int value = int.Parse(values[index]);
-                    bool isFixed = (value != 0); // If the value is not 0, it's fixed
-                    sudoku.Puzzle[i, j] = (value, isFixed);
-                    index++;
-                }
-            }
-
-            return sudoku;
-        }*/
+        public abstract bool SolveSudoku();
 
 
-        // prints the entire sudoku with axis to help determine where potential issues were.
+        /// <summary>
+        /// Prints the Sudoku board.
+        /// </summary>
         public void Print()
         {
             Console.WriteLine("*|-A-|-B-|-C-|-D-|-E-|-F-|-G-|-H-|-I-|*");
