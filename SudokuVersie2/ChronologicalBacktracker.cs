@@ -10,14 +10,14 @@ namespace SudokuVersie2
     internal class ChronologicalBacktracker : SudokuSolver
     {
 
-        public ChronologicalBacktracker((int, Boolean)[,] puzzle)
+        public ChronologicalBacktracker(Cell[,] puzzle)
         {
             this.puzzle = puzzle;
         }
 
         public static ChronologicalBacktracker FromString(string str)
         {
-            ChronologicalBacktracker solver = new ChronologicalBacktracker(new (int, Boolean)[9, 9]);
+            ChronologicalBacktracker solver = new ChronologicalBacktracker(new Cell[9, 9]);
 
             string[] values = str.Split(' ');
             int index = 0;
@@ -28,7 +28,7 @@ namespace SudokuVersie2
                 {
                     int value = int.Parse(values[index]);
                     bool isFixed = (value != 0);
-                    solver.puzzle[i, j] = (value, isFixed);
+                    solver.puzzle[i, j] = new Cell(value, isFixed, new List<int>());
                     index++;
                 }
             }
@@ -49,7 +49,7 @@ namespace SudokuVersie2
             // Check if 'num' is not in the current row and column
             for (int x = 0; x < 9; x++)
             {
-                if (puzzle[row, x].Item1 == val || puzzle[x, col].Item1 == val)
+                if (puzzle[row, x].val == val || puzzle[x, col].val == val)
                     return false;
             }
 
@@ -64,7 +64,7 @@ namespace SudokuVersie2
             {
                 for(int c = y_l; c < y_r; c++)
                 {
-                    if (this.puzzle[r, c].Item1 == val)
+                    if (this.puzzle[r, c].val == val)
                     {
                         return false;
                     }
@@ -86,7 +86,7 @@ namespace SudokuVersie2
             {
                 for (col = 0; col < 9; col++)
                 {
-                    if (puzzle[row, col].Item1 == 0)
+                    if (puzzle[row, col].val == 0)
                         return true;
                 }
             }
@@ -111,7 +111,7 @@ namespace SudokuVersie2
             {
                 if(ConstraintCheck(row, col, num))
                 {
-                    puzzle[row, col].Item1 = num;
+                    puzzle[row, col].val = num;
 
                     if (SolveSudoku())
                     {
@@ -119,7 +119,7 @@ namespace SudokuVersie2
                     }
 
 
-                    puzzle[row, col].Item1 = 0;
+                    puzzle[row, col].val = 0;
                 }
             }
             return false;

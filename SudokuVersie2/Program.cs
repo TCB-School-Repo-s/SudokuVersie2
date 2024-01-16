@@ -12,7 +12,7 @@ namespace SudokuVersie2
             Console.WriteLine("Hi, I am your Sudoku Solver Assistant! Please input your sudoku, make sure the numbers are seperated by spaces and there are no spaces in front or after the string: ");
             string sudoku = Console.ReadLine();
 
-            ChronologicalBacktracker sud = ChronologicalBacktracker.FromString(sudoku);
+            ForwardChecking sud = ForwardChecking.FromString(sudoku);
 
             Console.WriteLine("This is your current sudoku input:");
             sud.Print();
