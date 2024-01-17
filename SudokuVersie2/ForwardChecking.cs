@@ -27,8 +27,7 @@ namespace SudokuVersie2
                 {
                     int value = int.Parse(values[index]);
                     bool isFixed = (value != 0);
-                    List<int> list = new List<int>() { };
-                    list.AddRange(Enumerable.Range(1, 9));
+                    List<int> list = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
                     solver.puzzle[i, j] = new Cell(value, isFixed, list);
                     index++;
                 }
@@ -76,11 +75,11 @@ namespace SudokuVersie2
             // Check if 'num' is not in the current row and column
             for (int x = 0; x < 9; x++)
             {
-                if (puzzle[row, x].vast)
+                if (puzzle[row, x].val != 0)
                 {
                     puzzle[row, col].Domain.Remove(puzzle[row, x].val);
                 }
-                if (puzzle[x, col].vast)
+                if (puzzle[x, col].val != 0)
                 {
                     puzzle[row, col].Domain.Remove(puzzle[x, col].val);
                 }
@@ -90,14 +89,14 @@ namespace SudokuVersie2
             int x_l = (row / 3) * 3;
             int y_l = (col / 3) * 3;
 
-            int x_r = x_l + 2;
-            int y_r = y_l + 2;
+            int x_r = x_l + 3;
+            int y_r = y_l + 3;
 
             for (int r = x_l; r < x_r; r++)
             {
                 for (int c = y_l; c < y_r; c++)
                 {
-                    if (this.puzzle[r, c].vast)
+                    if (this.puzzle[r, c].val != 0)
                     {
                         puzzle[row, col].Domain.Remove(puzzle[r, c].val);
                     }
@@ -125,8 +124,8 @@ namespace SudokuVersie2
             int x_l = (row / 3) * 3;
             int y_l = (col / 3) * 3;
 
-            int x_r = x_l + 2;
-            int y_r = y_l + 2;
+            int x_r = x_l + 3;
+            int y_r = y_l + 3;
 
             for (int r = x_l; r < x_r; r++)
             {
@@ -142,36 +141,67 @@ namespace SudokuVersie2
             return true;
         }
 
-        private void updateDomains(int row, int col)
+        private Dictionary<(int, int), List<int>> updateDomainsForward(int row, int col, int num)
         {
+
+            Dictionary<(int, int), List<int>> dict = new Dictionary<(int, int), List<int>> ();
+
             // Update the domains of affected cells after making a move
             for (int x = 0; x < 9; x++)
             {
-                if (!puzzle[row, x].vast)
-                {
-                    updateDomain(row, x);
-                }
-                if (!puzzle[x, col].vast)
-                {
-                    updateDomain(x, col);
-                }
+                dict.Add((row, x), puzzle[row, x].Domain);
+                dict.Add((x, col), puzzle[x, col].Domain);
+                puzzle[row, x].Domain.Remove(num);
+                puzzle[x, col].Domain.Remove(num);
             }
 
             // Update the 3x3 part of the sudoku for the same value
             int x_l = (row / 3) * 3;
             int y_l = (col / 3) * 3;
 
-            int x_r = x_l + 2;
-            int y_r = y_l + 2;
+            int x_r = x_l + 3;
+            int y_r = y_l + 3;
 
             for (int r = x_l; r < x_r; r++)
             {
                 for (int c = y_l; c < y_r; c++)
                 {
-                    if (!puzzle[r, c].vast)
-                    {
-                        updateDomain(r, c);
-                    }
+                    dict.Add((r,c), puzzle[r,c].Domain);
+                    puzzle[r, c].Domain.Remove(num); 
+                }
+            }
+
+            return dict;
+        }
+
+        private void updateDomainsBackward(int row, int col, int num)
+        {
+            // Update the domains of affected cells after making a move
+            for (int x = 0; x < 9; x++)
+            {
+                puzzle[row, x].Domain.Add(num);
+                puzzle[row, x].Domain.Sort();
+               
+                //puzzle[x, col].Domain = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+                puzzle[x, col].Domain.Add(num);
+                puzzle[x, col].Domain.Sort();
+                
+            }
+
+            // Update the 3x3 part of the sudoku for the same value
+            int x_l = (row / 3) * 3;
+            int y_l = (col / 3) * 3;
+
+            int x_r = x_l + 3;
+            int y_r = y_l + 3;
+
+            for (int r = x_l; r < x_r; r++)
+            {
+                for (int c = y_l; c < y_r; c++)
+                {
+                    puzzle[r, c].Domain.Add(num);
+                    puzzle[r, c].Domain.Sort();
+                    
                 }
             }
         }
@@ -184,28 +214,26 @@ namespace SudokuVersie2
         {
             int row, col;
 
-            if(!IsSolved(out row, out col))
+            if (!IsSolved(out row, out col))
             {
                 return true;
             }
 
-            foreach (int num in puzzle[row, col].Domain.ToList())
+            Console.WriteLine($"{row}, {col}");
+
+            foreach (int num in puzzle[row, col].Domain)
             {
-                if(ConstraintCheck(row, col, num))
+                puzzle[row, col].val = num;
+
+                updateDomainsForward(row, col, num);
+
+                if (SolveSudoku())
                 {
-                    puzzle[row, col].val = num;
-
-                    updateDomains(row, col);
-
-                    if (SolveSudoku())
-                    {
-                        return true;
-                    }
-
-                    puzzle[row, col].val = 0;
-                    updateDomains(row, col);
-
+                    return true;
                 }
+
+                puzzle[row, col].val = 0;
+                updateDomainsBackward(row, col, num);
             }
 
             return false;

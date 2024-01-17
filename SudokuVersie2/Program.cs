@@ -13,14 +13,13 @@ namespace SudokuVersie2
             {
                 new MenuOption("Chronological Backtracking", () => ChronologicalBacktrackingAction(ChronologicalBacktracker.FromString(sudoku))),
                 new MenuOption("Forward Checking without MVC", () => ForwardCheckingAction(ForwardChecking.FromString(sudoku))),
-                new MenuOption("Forward Checking with MVC", () => {Console.WriteLine("This is not available yet :("); Environment.Exit(666); })
+                new MenuOption("Forward Checking with MVC", () => ForwardCheckingMVCAction(ForwardMVC.FromString(sudoku)))
             };
 
             int index = 0;
 
             PrintMenu(options, options[index]);
 
-            ConsoleKeyInfo keyInfo;
             ConsoleKeyInfo keyinfo;
             do
             {
@@ -52,11 +51,38 @@ namespace SudokuVersie2
             }
             while (keyinfo.Key != ConsoleKey.X);
 
-            Console.ReadKey();
-
         }
 
         static void ForwardCheckingAction(ForwardChecking sud) {
+            Stopwatch stopwatch = new Stopwatch();
+
+            Console.Clear();
+
+            Console.WriteLine("This is your current sudoku input:");
+            sud.Print();
+
+            Console.WriteLine("I will now attempt to solve the sudoku...");
+            stopwatch.Start();
+
+            bool hey = sud.SolveSudoku();
+            if (hey)
+            {
+                stopwatch.Stop();
+                Console.WriteLine($"I have found a solution! It took me: {stopwatch.ElapsedMilliseconds}ms");
+                sud.Print();
+            }
+            else
+            {
+                stopwatch.Stop();
+                Console.WriteLine("I am very sorry, the sudoku appears to not be solveable :(");
+            }
+
+            Environment.Exit(0);
+
+        }
+
+        static void ForwardCheckingMVCAction(ForwardMVC sud)
+        {
             Stopwatch stopwatch = new Stopwatch();
 
             Console.Clear();

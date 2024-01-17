@@ -27,8 +27,7 @@ namespace SudokuVersie2
                 {
                     int value = int.Parse(values[index]);
                     bool isFixed = (value != 0);
-                    List<int> list = new List<int>() { };
-                    list.AddRange(Enumerable.Range(1, 9));
+                    List<int> list = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
                     solver.puzzle[i, j] = new Cell(value, isFixed, list);
                     index++;
                 }
@@ -142,11 +141,97 @@ namespace SudokuVersie2
             return true;
         }
 
-        private void updateDomainsForward(int row, int col){
+        private void updateDomainsForward(int row, int col)
+        {
+            // Update the domains of affected cells after making a move
+            for (int x = 0; x < 9; x++)
+            {
+                if (!puzzle[row, x].vast)
+                {
+                    updateDomain(row, x);
+                }
+                if (!puzzle[x, col].vast)
+                {
+                    updateDomain(x, col);
+                }
+            }
 
+            // Update the 3x3 part of the sudoku for the same value
+            int x_l = (row / 3) * 3;
+            int y_l = (col / 3) * 3;
+
+            int x_r = x_l + 2;
+            int y_r = y_l + 2;
+
+            for (int r = x_l; r < x_r; r++)
+            {
+                for (int c = y_l; c < y_r; c++)
+                {
+                    if (!puzzle[r, c].vast)
+                    {
+                        updateDomain(r, c);
+                    }
+                }
+            }
         }
 
-        private void updateDomainsBackward(int row, int col){
+        private void updateDomainsBackward(int row, int col)
+        {
+            // Update the domains of affected cells after making a move
+            for (int x = 0; x < 9; x++)
+            {
+                if (!puzzle[row, x].vast)
+                {
+                    puzzle[row, x].Domain = new List<int>();
+                    puzzle[row, x].Domain.AddRange(Enumerable.Range(1, 9));
+                    updateDomain(row, x);
+                }
+                if (!puzzle[x, col].vast)
+                {
+                    puzzle[x, col].Domain = new List<int>();
+                    puzzle[x, col].Domain.AddRange(Enumerable.Range(1, 9));
+                    updateDomain(x, col);
+                }
+            }
+
+            // Update the 3x3 part of the sudoku for the same value
+            int x_l = (row / 3) * 3;
+            int y_l = (col / 3) * 3;
+
+            int x_r = x_l + 2;
+            int y_r = y_l + 2;
+
+            for (int r = x_l; r < x_r; r++)
+            {
+                for (int c = y_l; c < y_r; c++)
+                {
+                    if (!puzzle[r, c].vast)
+                    {
+                        updateDomain(r, c);
+                    }
+                }
+            }
+        }
+
+        private (int, int) FindMostConstrainedVariable()
+        {
+            (int, int) mvc = (0, 0);
+
+            for(int i = 0; i<9; i++)
+            {
+                for(int j = 0; j < 9; j++)
+                {
+                    if (!puzzle[i, j].vast)
+                    {
+                        if (puzzle[i, j].Domain.Count < puzzle[mvc.Item1, mvc.Item2].Domain.Count)
+                        {
+                            mvc = (i, j);
+                        }
+                    }
+                }
+            }
+
+            return mvc;
 
         }
 
@@ -156,13 +241,39 @@ namespace SudokuVersie2
         /// <returns>True if a solution is found, otherwise false.</returns>
         public override bool SolveSudoku()
         {
-           int row, col;
+            int row, col;
 
-           if(!IsSolved(out row, out col))
-           {
-        
-           }
+            if (!IsSolved(out row, out col))
+            {
+                return true;
+            }
+
+            (int, int) mvc = FindMostConstrainedVariable();
+
+            row = mvc.Item1;
+            col = mvc.Item2;
+
+            foreach (int num in puzzle[row, col].Domain.ToList())
+            {
+                if (ConstraintCheck(row, col, num))
+                {
+                    puzzle[row, col].val = num;
+
+                    updateDomainsForward(row, col);
+
+                    if (SolveSudoku())
+                    {
+                        return true;
+                    }
+
+                    puzzle[row, col].val = 0;
+                    updateDomainsBackward(row, col); // optimise by using a list???
+
+                }
+            }
+
             return false;
         }
     }
+
 }

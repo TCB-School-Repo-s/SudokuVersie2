@@ -57,8 +57,8 @@ namespace SudokuVersie2
             int x_l = (row / 3) * 3;
             int y_l = (col / 3) * 3;
 
-            int x_r = x_l + 2;
-            int y_r = y_l + 2;
+            int x_r = x_l + 3;
+            int y_r = y_l + 3;
 
             for (int r = x_l; r < x_r; r++)
             {
@@ -94,6 +94,8 @@ namespace SudokuVersie2
             return false;
         }
 
+
+
         /// <summary>
         /// Solves the Sudoku puzzle using Chronological Backtracking.
         /// </summary>
@@ -107,7 +109,9 @@ namespace SudokuVersie2
                 return true;
             }
 
-            for(int num = 1; num <= 9; num++)
+            Console.WriteLine($"{row}, {col}");
+
+            for (int num = 1; num <= 9; num++)
             {
                 if(ConstraintCheck(row, col, num))
                 {
