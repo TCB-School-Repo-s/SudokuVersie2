@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -142,22 +142,13 @@ namespace SudokuVersie2
             return true;
         }
 
-        /*private List<(int, int)> MVCSort()
-        {
-            List<(int, int)> vars = new List<(int, int)>();
+        private void updateDomainsForward(int row, int col){
 
-            for (int i = 0; i < 9; i++)
-            {
-                for(int j = 0; j < 9; j++)
-                {
-                    vars.Add((i,j));
-                }
-            }
+        }
 
-            vars.Sort((a,b) => )
+        private void updateDomainsBackward(int row, int col){
 
-
-        }*/
+        }
 
         /// <summary>
         /// Solves the Sudoku puzzle using Chronological Backtracking.
@@ -165,29 +156,13 @@ namespace SudokuVersie2
         /// <returns>True if a solution is found, otherwise false.</returns>
         public override bool SolveSudoku()
         {
-            int row, col;
+           int row, int col;
 
-            if (!IsSolved(out row, out col))
-            {
-                return true;
-            }
+           if(!IsSolved(out row, out col))
+           {
+        
+           }
 
-            foreach (int val in puzzle[row, col].Domain)
-            {
-                if (ConstraintCheck(row, col, val))
-                {
-                    puzzle[row, col].val = val;
-
-                    if (SolveSudoku())
-                    {
-                        return true;
-                    }
-
-
-                    puzzle[row, col].val = 0;
-                }
-            }
-            return false;
         }
     }
 }
