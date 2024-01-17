@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 
 namespace SudokuVersie2
 {
-    internal class ForwardChecking : SudokuSolver
+    internal class ForwardMVC : SudokuSolver
     {
 
-        public ForwardChecking(Cell[,] puzzle)
+        public ForwardMVC(Cell[,] puzzle)
         {
             this.puzzle = puzzle;
         }
 
-        public static ForwardChecking FromString(string str)
+        public static ForwardMVC FromString(string str)
         {
-            ForwardChecking solver = new ForwardChecking(new Cell[9, 9]);
+            ForwardMVC solver = new ForwardMVC(new Cell[9, 9]);
 
             string[] values = str.Split(' ');
             int index = 0;
@@ -34,9 +34,9 @@ namespace SudokuVersie2
                 }
             }
 
-            for(int p = 0; p < 9; p++)
+            for (int p = 0; p < 9; p++)
             {
-                for(int q = 0; q < 9 ; q++)
+                for (int q = 0; q < 9; q++)
                 {
                     if (!solver.puzzle[p, q].vast)
                     {
@@ -69,29 +69,7 @@ namespace SudokuVersie2
             return false;
         }
 
-        public void updateDomains(int row, int col)
-        {
-            for(int i = 0; i<9; i++)
-            {
-                updateDomain(row, i);
-                updateDomain(i, col);
-            }
 
-            // Check the 3x3 part of the sudoku for the same value
-            int x_l = (row / 3) * 3;
-            int y_l = (col / 3) * 3;
-
-            int x_r = x_l + 2;
-            int y_r = y_l + 2;
-
-            for (int r = x_l; r < x_r; r++)
-            {
-                for (int c = y_l; c < y_r; c++)
-                {
-                    updateDomain(r, c);
-                }
-            }
-        }
 
         public void updateDomain(int row, int col)
         {
@@ -100,11 +78,11 @@ namespace SudokuVersie2
             {
                 if (puzzle[row, x].vast)
                 {
-                    puzzle[row,col].Domain.Remove(puzzle[row, x].val);
+                    puzzle[row, col].Domain.Remove(puzzle[row, x].val);
                 }
-                if(puzzle[x, col].vast)
+                if (puzzle[x, col].vast)
                 {
-                    puzzle[row,col].Domain.Remove(puzzle[x, col].val);
+                    puzzle[row, col].Domain.Remove(puzzle[x, col].val);
                 }
             }
 
@@ -121,7 +99,7 @@ namespace SudokuVersie2
                 {
                     if (this.puzzle[r, c].vast)
                     {
-                        puzzle[row,col].Domain.Remove(puzzle[r,c].val);
+                        puzzle[row, col].Domain.Remove(puzzle[r, c].val);
                     }
                 }
             }
@@ -164,38 +142,27 @@ namespace SudokuVersie2
             return true;
         }
 
+        private void updateDomainsForward(int row, int col){
+
+        }
+
+        private void updateDomainsBackward(int row, int col){
+
+        }
+
         /// <summary>
         /// Solves the Sudoku puzzle using Chronological Backtracking.
         /// </summary>
         /// <returns>True if a solution is found, otherwise false.</returns>
         public override bool SolveSudoku()
         {
-            int row, col;
+           int row, int col;
 
-            if (!IsSolved(out row, out col))
-            {
-                return true;
-            }
+           if(!IsSolved(out row, out col))
+           {
+        
+           }
 
-            foreach (int val in puzzle[row,col].Domain.ToList())
-            {
-                if (ConstraintCheck(row, col, val))
-                {
-                    puzzle[row, col].val = val;
-                    Cell[,] domainCopy = puzzle.Clone() as Cell[,];
-                    puzzle[row, col].Domain.Clear();
-                    updateDomains(row, col);
-
-                    if (SolveSudoku())
-                    {
-                        return true;
-                    }
-
-                    puzzle = domainCopy;
-                    
-                }
-            }
-            return false;
         }
     }
 }
