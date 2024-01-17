@@ -141,16 +141,20 @@ namespace SudokuVersie2
             return true;
         }
 
-        private Dictionary<(int, int), List<int>> updateDomainsForward(int row, int col, int num)
+        private Dictionary<string, Dictionary<(int, int), List<int>>> updateDomainsForward(int row, int col, int num)
         {
 
-            Dictionary<(int, int), List<int>> dict = new Dictionary<(int, int), List<int>> ();
+            Dictionary<string, Dictionary<(int, int), List<int>>> dict = new Dictionary<string, Dictionary<(int, int), List<int>>>();
+
+            Dictionary<(int, int), List<int>> rrow = new Dictionary<(int, int), List<int>> ();
+            Dictionary<(int, int), List<int>> ccol = new Dictionary<(int, int), List<int>>();
+            Dictionary<(int, int), List<int>> block = new Dictionary<(int, int), List<int>>();
 
             // Update the domains of affected cells after making a move
             for (int x = 0; x < 9; x++)
             {
-                dict.Add((row, x), puzzle[row, x].Domain);
-                dict.Add((x, col), puzzle[x, col].Domain);
+                rrow.Add((row, x), puzzle[row, x].Domain);
+                ccol.Add((x, col), puzzle[x, col].Domain);
                 puzzle[row, x].Domain.Remove(num);
                 puzzle[x, col].Domain.Remove(num);
             }
@@ -166,42 +170,24 @@ namespace SudokuVersie2
             {
                 for (int c = y_l; c < y_r; c++)
                 {
-                    dict.Add((r,c), puzzle[r,c].Domain);
+                    block.Add((r,c), puzzle[r,c].Domain);
                     puzzle[r, c].Domain.Remove(num); 
                 }
             }
 
+            dict.Add("row", rrow);
+            dict.Add("col", ccol);
+            dict.Add("block", block);
+
             return dict;
         }
 
-        private void updateDomainsBackward(int row, int col, int num)
+        private void updateDomainsBackward(Dictionary<string, Dictionary<(int, int), List<int>>> dict)
         {
-            // Update the domains of affected cells after making a move
-            for (int x = 0; x < 9; x++)
+            foreach(string index in dict.Keys)
             {
-                puzzle[row, x].Domain.Add(num);
-                puzzle[row, x].Domain.Sort();
-               
-                //puzzle[x, col].Domain = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-                puzzle[x, col].Domain.Add(num);
-                puzzle[x, col].Domain.Sort();
-                
-            }
-
-            // Update the 3x3 part of the sudoku for the same value
-            int x_l = (row / 3) * 3;
-            int y_l = (col / 3) * 3;
-
-            int x_r = x_l + 3;
-            int y_r = y_l + 3;
-
-            for (int r = x_l; r < x_r; r++)
-            {
-                for (int c = y_l; c < y_r; c++)
-                {
-                    puzzle[r, c].Domain.Add(num);
-                    puzzle[r, c].Domain.Sort();
-                    
+                foreach((int, int) x in dict[index].Keys) {
+                    puzzle[x.Item1, x.Item2].Domain = dict[index][x];
                 }
             }
         }
@@ -225,7 +211,7 @@ namespace SudokuVersie2
             {
                 puzzle[row, col].val = num;
 
-                updateDomainsForward(row, col, num);
+                var dict = updateDomainsForward(row, col, num);
 
                 if (SolveSudoku())
                 {
@@ -233,7 +219,7 @@ namespace SudokuVersie2
                 }
 
                 puzzle[row, col].val = 0;
-                updateDomainsBackward(row, col, num);
+                updateDomainsBackward(dict);
             }
 
             return false;
