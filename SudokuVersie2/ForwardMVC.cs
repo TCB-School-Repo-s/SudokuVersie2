@@ -156,13 +156,13 @@ namespace SudokuVersie2
         /// <returns>True if a solution is found, otherwise false.</returns>
         public override bool SolveSudoku()
         {
-           int row, int col;
+           int row, col;
 
            if(!IsSolved(out row, out col))
            {
         
            }
-
+            return false;
         }
     }
 }
