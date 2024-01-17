@@ -12,7 +12,8 @@ namespace SudokuVersie2
             var options = new List<MenuOption>()
             {
                 new MenuOption("Chronological Backtracking", () => ChronologicalBacktrackingAction(ChronologicalBacktracker.FromString(sudoku))),
-                new MenuOption("Forward Checking without MVC", () => ForwardCheckingAction(ForwardChecking.FromString(sudoku)))
+                new MenuOption("Forward Checking without MVC", () => ForwardCheckingAction(ForwardChecking.FromString(sudoku))),
+                new MenuOption("Forward Checking with MVC", () => {Console.WriteLine("This is not available yet :("); Environment.Exit(666); })
             };
 
             int index = 0;

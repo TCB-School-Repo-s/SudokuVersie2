@@ -118,7 +118,6 @@ namespace SudokuVersie2
                         return true;
                     }
 
-
                     puzzle[row, col].val = 0;
                 }
             }

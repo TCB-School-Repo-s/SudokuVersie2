@@ -142,43 +142,9 @@ namespace SudokuVersie2
             return true;
         }
 
-        private void updateDomainsForward(int row, int col)
+        private void updateDomains(int row, int col)
         {
             // Update the domains of affected cells after making a move
-            for (int x = 0; x < 9; x++)
-            {
-                if (!puzzle[row, x].vast)
-                {
-                    updateDomain(row, x);
-                }
-                if (!puzzle[x, col].vast)
-                {
-                    updateDomain(x, col);
-                }
-            }
-
-            // Update the 3x3 part of the sudoku for the same value
-            int x_l = (row / 3) * 3;
-            int y_l = (col / 3) * 3;
-
-            int x_r = x_l + 2;
-            int y_r = y_l + 2;
-
-            for (int r = x_l; r < x_r; r++)
-            {
-                for (int c = y_l; c < y_r; c++)
-                {
-                    if (!puzzle[r, c].vast)
-                    {
-                        updateDomain(r, c);
-                    }
-                }
-            }
-        }
-
-        private void updateDomainsBackward(int row, int col)
-        {
-            // Restore the domains of affected cells after backtracking
             for (int x = 0; x < 9; x++)
             {
                 if (!puzzle[row, x].vast)
@@ -229,7 +195,7 @@ namespace SudokuVersie2
                 {
                     puzzle[row, col].val = num;
 
-                    updateDomainsForward(row, col);
+                    updateDomains(row, col);
 
                     if (SolveSudoku())
                     {
@@ -237,7 +203,7 @@ namespace SudokuVersie2
                     }
 
                     puzzle[row, col].val = 0;
-                    updateDomainsBackward(row, col);
+                    updateDomains(row, col);
 
                 }
             }
