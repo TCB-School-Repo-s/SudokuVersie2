@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 
 namespace SudokuVersie2
 {
-    internal class ForwardMVC : SudokuSolver
+    internal class ForwardChecking : SudokuSolver
     {
 
-        public ForwardMVC(Cell[,] puzzle)
+        public ForwardChecking(Cell[,] puzzle)
         {
             this.puzzle = puzzle;
         }
 
-        public static ForwardMVC FromString(string str)
+        public static ForwardChecking FromString(string str)
         {
-            ForwardMVC solver = new ForwardMVC(new Cell[9, 9]);
+            ForwardChecking solver = new ForwardChecking(new Cell[9, 9]);
 
             string[] values = str.Split(' ');
             int index = 0;
