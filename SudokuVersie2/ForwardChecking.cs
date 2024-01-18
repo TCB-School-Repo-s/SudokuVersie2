@@ -102,11 +102,19 @@ namespace SudokuVersie2
             }
         }
 
+        /// <summary>
+        /// The function <c>updateDomainBackwards</c> removes the number from the domain of the affected cells and stores them in dictionary for backtracking.
+        /// </summary>
+        /// <param name="row">The row of the changed cell</param>
+        /// <param name="col">The column of the changed cell</param>
+        /// <param name="num">Value that the cell got</param>
+        /// <returns>A dictionary containing three dictionaries, each containing the cell locations and removed number of the domain.</returns>
         private Dictionary<string, Dictionary<(int, int), int>> updateDomainsForward(int row, int col, int num)
         {
 
-            Dictionary<string, Dictionary<(int, int), int>> dict = new Dictionary<string, Dictionary<(int, int), int>>();
+            Dictionary<string, Dictionary<(int, int), int>> dict = new Dictionary<string, Dictionary<(int, int), int>>(); // Init the dictionary
 
+            // Init the sub dictionaries
             Dictionary<(int, int), int> rrow = new Dictionary<(int, int), int>();
             Dictionary<(int, int), int> ccol = new Dictionary<(int, int), int>();
             Dictionary<(int, int), int> block = new Dictionary<(int, int), int>();
@@ -114,7 +122,7 @@ namespace SudokuVersie2
             // Update the domains of affected cells after making a move
             for (int x = 0; x < 9; x++)
             {
-                if(puzzle[row, x].Domain.Remove(num))
+                if(puzzle[row, x].Domain.Remove(num)) // If the number is removed from the domain, add it to the dictionary
                 {
                     rrow.Add((row, x), num);
                 }
@@ -124,7 +132,7 @@ namespace SudokuVersie2
                 }
             }
 
-            // Update the 3x3 part of the sudoku for the same value
+            // Check the 3x3 part of the sudoku
             int x_l = (row / 3) * 3;
             int y_l = (col / 3) * 3;
 
@@ -149,19 +157,23 @@ namespace SudokuVersie2
             return dict;
         }
 
+        /// <summary>
+        /// The function <c>updateDomainBackwards</c> uses a dictionary to restore the domains to what it was after updating them.
+        /// </summary>
+        /// <param name="dict">Dictionary containing three dictionarys: row, col and block</param>
         private void updateDomainsBackward(Dictionary<string, Dictionary<(int, int), int>> dict)
         {
-            foreach(string index in dict.Keys)
+            foreach(string index in dict.Keys) // Iterate over the 3 dictionaries
             {
-                foreach((int, int) x in dict[index].Keys) {
-                    puzzle[x.Item1, x.Item2].Domain.Add(dict[index][x]);
-                    puzzle[x.Item1, x.Item2].Domain.Sort();
+                foreach((int, int) x in dict[index].Keys) { // Iterate over the items in that dictionary
+                    puzzle[x.Item1, x.Item2].Domain.Add(dict[index][x]); // Add it back into the domain
+                    puzzle[x.Item1, x.Item2].Domain.Sort(); // Sort the domain in chronological order
                 }
             }
         }
 
         /// <summary>
-        /// Solves the Sudoku puzzle using Chronological Backtracking.
+        /// Solves the Sudoku puzzle using the Forward Checking algorithm.
         /// </summary>
         /// <returns>True if a solution is found, otherwise false.</returns>
         public override bool SolveSudoku()
