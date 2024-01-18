@@ -68,8 +68,6 @@ namespace SudokuVersie2
             return false;
         }
 
-
-
         public void updateDomain(int row, int col)
         {
             // Check if 'num' is not in the current row and column
@@ -104,59 +102,26 @@ namespace SudokuVersie2
             }
         }
 
-        /// <summary>
-        /// Checks if it is safe to place a number in a particular cell.
-        /// </summary>
-        /// <param name="row">The row index of the cell.</param>
-        /// <param name="col">The column index of the cell.</param>
-        /// <param name="val">The number to be placed.</param>
-        /// <returns>True if it is safe to place the number, otherwise false.</returns>
-        public bool ConstraintCheck(int row, int col, int val)
-        {
-            // Check if 'num' is not in the current row and column
-            for (int x = 0; x < 9; x++)
-            {
-                if (puzzle[row, x].val == val || puzzle[x, col].val == val)
-                    return false;
-            }
-
-            // Check the 3x3 part of the sudoku for the same value
-            int x_l = (row / 3) * 3;
-            int y_l = (col / 3) * 3;
-
-            int x_r = x_l + 3;
-            int y_r = y_l + 3;
-
-            for (int r = x_l; r < x_r; r++)
-            {
-                for (int c = y_l; c < y_r; c++)
-                {
-                    if (this.puzzle[r, c].val == val)
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
-        }
-
-        private Dictionary<string, Dictionary<(int, int), List<int>>> updateDomainsForward(int row, int col, int num)
+        private Dictionary<string, Dictionary<(int, int), int>> updateDomainsForward(int row, int col, int num)
         {
 
-            Dictionary<string, Dictionary<(int, int), List<int>>> dict = new Dictionary<string, Dictionary<(int, int), List<int>>>();
+            Dictionary<string, Dictionary<(int, int), int>> dict = new Dictionary<string, Dictionary<(int, int), int>>();
 
-            Dictionary<(int, int), List<int>> rrow = new Dictionary<(int, int), List<int>> ();
-            Dictionary<(int, int), List<int>> ccol = new Dictionary<(int, int), List<int>>();
-            Dictionary<(int, int), List<int>> block = new Dictionary<(int, int), List<int>>();
+            Dictionary<(int, int), int> rrow = new Dictionary<(int, int), int>();
+            Dictionary<(int, int), int> ccol = new Dictionary<(int, int), int>();
+            Dictionary<(int, int), int> block = new Dictionary<(int, int), int>();
 
             // Update the domains of affected cells after making a move
             for (int x = 0; x < 9; x++)
             {
-                rrow.Add((row, x), puzzle[row, x].Domain);
-                ccol.Add((x, col), puzzle[x, col].Domain);
-                puzzle[row, x].Domain.Remove(num);
-                puzzle[x, col].Domain.Remove(num);
+                if(puzzle[row, x].Domain.Remove(num))
+                {
+                    rrow.Add((row, x), num);
+                }
+                if(puzzle[x, col].Domain.Remove(num))
+                {
+                    ccol.Add((x, col), num);
+                }
             }
 
             // Update the 3x3 part of the sudoku for the same value
@@ -170,8 +135,10 @@ namespace SudokuVersie2
             {
                 for (int c = y_l; c < y_r; c++)
                 {
-                    block.Add((r,c), puzzle[r,c].Domain);
-                    puzzle[r, c].Domain.Remove(num); 
+                    if(puzzle[r, c].Domain.Remove(num))
+                    {
+                        block.Add((r, c), num);
+                    }
                 }
             }
 
@@ -182,12 +149,13 @@ namespace SudokuVersie2
             return dict;
         }
 
-        private void updateDomainsBackward(Dictionary<string, Dictionary<(int, int), List<int>>> dict)
+        private void updateDomainsBackward(Dictionary<string, Dictionary<(int, int), int>> dict)
         {
             foreach(string index in dict.Keys)
             {
                 foreach((int, int) x in dict[index].Keys) {
-                    puzzle[x.Item1, x.Item2].Domain = dict[index][x];
+                    puzzle[x.Item1, x.Item2].Domain.Add(dict[index][x]);
+                    puzzle[x.Item1, x.Item2].Domain.Sort();
                 }
             }
         }
@@ -205,9 +173,7 @@ namespace SudokuVersie2
                 return true;
             }
 
-            Console.WriteLine($"{row}, {col}");
-
-            foreach (int num in puzzle[row, col].Domain)
+            foreach (int num in puzzle[row, col].Domain.ToList())
             {
                 puzzle[row, col].val = num;
 
