@@ -141,74 +141,73 @@ namespace SudokuVersie2
             return true;
         }
 
-        private void updateDomainsForward(int row, int col)
+        /// <summary>
+        /// The function <c>updateDomainBackwards</c> removes the number from the domain of the affected cells and stores them in dictionary for backtracking.
+        /// </summary>
+        /// <param name="row">The row of the changed cell</param>
+        /// <param name="col">The column of the changed cell</param>
+        /// <param name="num">Value that the cell got</param>
+        /// <returns>A dictionary containing three dictionaries, each containing the cell locations and removed number of the domain.</returns>
+        private Dictionary<string, Dictionary<(int, int), int>> updateDomainsForward(int row, int col, int num)
         {
+
+            Dictionary<string, Dictionary<(int, int), int>> dict = new Dictionary<string, Dictionary<(int, int), int>>(); // Init the dictionary
+
+            // Init the sub dictionaries
+            Dictionary<(int, int), int> rrow = new Dictionary<(int, int), int>();
+            Dictionary<(int, int), int> ccol = new Dictionary<(int, int), int>();
+            Dictionary<(int, int), int> block = new Dictionary<(int, int), int>();
+
             // Update the domains of affected cells after making a move
             for (int x = 0; x < 9; x++)
             {
-                if (!puzzle[row, x].vast)
+                if (puzzle[row, x].Domain.Remove(num)) // If the number is removed from the domain, add it to the dictionary
                 {
-                    updateDomain(row, x);
+                    rrow.Add((row, x), num);
                 }
-                if (!puzzle[x, col].vast)
+                if (puzzle[x, col].Domain.Remove(num))
                 {
-                    updateDomain(x, col);
+                    ccol.Add((x, col), num);
                 }
             }
 
-            // Update the 3x3 part of the sudoku for the same value
+            // Check the 3x3 part of the sudoku
             int x_l = (row / 3) * 3;
             int y_l = (col / 3) * 3;
 
-            int x_r = x_l + 2;
-            int y_r = y_l + 2;
+            int x_r = x_l + 3;
+            int y_r = y_l + 3;
 
             for (int r = x_l; r < x_r; r++)
             {
                 for (int c = y_l; c < y_r; c++)
                 {
-                    if (!puzzle[r, c].vast)
+                    if (puzzle[r, c].Domain.Remove(num))
                     {
-                        updateDomain(r, c);
+                        block.Add((r, c), num);
                     }
                 }
             }
+
+            dict.Add("row", rrow);
+            dict.Add("col", ccol);
+            dict.Add("block", block);
+
+            return dict;
         }
 
-        private void updateDomainsBackward(int row, int col)
+        /// <summary>
+        /// The function <c>updateDomainBackwards</c> uses a dictionary to restore the domains to what it was after updating them.
+        /// </summary>
+        /// <param name="dict">Dictionary containing three dictionarys: row, col and block</param>
+        private void updateDomainsBackward(Dictionary<string, Dictionary<(int, int), int>> dict)
         {
-            // Update the domains of affected cells after making a move
-            for (int x = 0; x < 9; x++)
+            foreach (string index in dict.Keys) // Iterate over the 3 dictionaries
             {
-                if (!puzzle[row, x].vast)
-                {
-                    puzzle[row, x].Domain = new List<int>();
-                    puzzle[row, x].Domain.AddRange(Enumerable.Range(1, 9));
-                    updateDomain(row, x);
-                }
-                if (!puzzle[x, col].vast)
-                {
-                    puzzle[x, col].Domain = new List<int>();
-                    puzzle[x, col].Domain.AddRange(Enumerable.Range(1, 9));
-                    updateDomain(x, col);
-                }
-            }
-
-            // Update the 3x3 part of the sudoku for the same value
-            int x_l = (row / 3) * 3;
-            int y_l = (col / 3) * 3;
-
-            int x_r = x_l + 2;
-            int y_r = y_l + 2;
-
-            for (int r = x_l; r < x_r; r++)
-            {
-                for (int c = y_l; c < y_r; c++)
-                {
-                    if (!puzzle[r, c].vast)
-                    {
-                        updateDomain(r, c);
-                    }
+                foreach ((int, int) x in dict[index].Keys)
+                { // Iterate over the items in that dictionary
+                    puzzle[x.Item1, x.Item2].Domain.Add(dict[index][x]); // Add it back into the domain
+                    puzzle[x.Item1, x.Item2].Domain.Sort(); // Sort the domain in chronological order
                 }
             }
         }
@@ -259,7 +258,7 @@ namespace SudokuVersie2
                 {
                     puzzle[row, col].val = num;
 
-                    updateDomainsForward(row, col);
+                    var dict = updateDomainsForward(row, col, num);
 
                     if (SolveSudoku())
                     {
@@ -267,7 +266,7 @@ namespace SudokuVersie2
                     }
 
                     puzzle[row, col].val = 0;
-                    updateDomainsBackward(row, col); // optimise by using a list???
+                    updateDomainsBackward(dict); // optimise by using a list???
 
                 }
             }
