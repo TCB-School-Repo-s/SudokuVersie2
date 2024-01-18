@@ -109,8 +109,6 @@ namespace SudokuVersie2
                 return true;
             }
 
-            Console.WriteLine($"{row}, {col}");
-
             for (int num = 1; num <= 9; num++)
             {
                 if(ConstraintCheck(row, col, num))
