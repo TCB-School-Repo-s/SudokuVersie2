@@ -13,7 +13,7 @@ namespace SudokuVersie2
             {
                 new MenuOption("Chronological Backtracking", () => ChronologicalBacktrackingAction(ChronologicalBacktracker.FromString(sudoku))),
                 new MenuOption("Forward Checking without MVC", () => ForwardCheckingAction(ForwardChecking.FromString(sudoku))),
-                new MenuOption("Forward Checking with MVC", () => ForwardCheckingMVCAction(ForwardMVC.FromString(sudoku)))
+                new MenuOption("Forward Checking with MVC", () => ForwardCheckingMVCAction(ForwardMCV.FromString(sudoku)))
             };
 
             int index = 0;
@@ -68,7 +68,7 @@ namespace SudokuVersie2
             if (hey)
             {
                 stopwatch.Stop();
-                Console.WriteLine($"I have found a solution! It took me: {stopwatch.ElapsedMilliseconds}ms");
+                Console.WriteLine($"I have found a solution! It took me: {stopwatch.ElapsedMilliseconds}ms or {stopwatch.ElapsedTicks} ticks");
                 sud.Print();
             }
             else
@@ -81,7 +81,7 @@ namespace SudokuVersie2
 
         }
 
-        static void ForwardCheckingMVCAction(ForwardMVC sud)
+        static void ForwardCheckingMVCAction(ForwardMCV sud)
         {
             Stopwatch stopwatch = new Stopwatch();
 
@@ -93,11 +93,12 @@ namespace SudokuVersie2
             Console.WriteLine("I will now attempt to solve the sudoku...");
             stopwatch.Start();
 
-            bool hey = sud.SolveSudoku();
+            List<(int, int)> doms = sud.GetSortedDomains();
+            bool hey = sud.SolveSudokuMCV(doms);
             if (hey)
             {
                 stopwatch.Stop();
-                Console.WriteLine($"I have found a solution! It took me: {stopwatch.ElapsedMilliseconds}ms");
+                Console.WriteLine($"I have found a solution! It took me: {stopwatch.ElapsedMilliseconds}ms or {stopwatch.ElapsedTicks} ticks");
                 sud.Print();
             }
             else
@@ -126,7 +127,7 @@ namespace SudokuVersie2
             if (hey)
             {
                 stopwatch.Stop();
-                Console.WriteLine($"I have found a solution! It took me: {stopwatch.ElapsedMilliseconds}ms");
+                Console.WriteLine($"I have found a solution! It took me: {stopwatch.ElapsedMilliseconds}ms or {stopwatch.ElapsedTicks} ticks");
                 sud.Print();
             }
             else
