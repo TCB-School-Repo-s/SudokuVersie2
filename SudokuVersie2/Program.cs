@@ -1,4 +1,7 @@
 ﻿using System.Diagnostics;
+using Microsoft.Data.Analysis;
+
+
 
 namespace SudokuVersie2
 {
@@ -6,6 +9,46 @@ namespace SudokuVersie2
     {
         static void Main(string[] args)
         {
+            //Experiment code
+            /*var timeList = new List<Single>() { 0 };
+            var timeTickList = new List<Single>() { 0 };
+            // To run the code below you need to install the Microsoft.Data.Analysis; package.
+            var timeColumn = new SingleDataFrameColumn("timeTakenMs", timeList);
+            var timeColum2 = new SingleDataFrameColumn("timeTakenTicks", timeTickList);
+            var dataframe = new DataFrame(timeColumn, timeColum2);
+
+            string sud = "0 2 0 8 1 0 7 4 0 7 0 0 0 0 3 1 0 0 0 9 0 0 0 2 8 0 5 0 0 9 0 4 0 0 8 7 4 0 0 2 0 8 0 0 3 1 6 0 0 3 0 2 0 0 3 0 2 7 0 0 0 6 0 0 0 5 6 0 0 0 0 8 0 7 6 0 5 1 0 9 0";
+
+            List<int> ms = new List<int>();
+            List<int> ts = new List<int>();
+
+            for(int i = 0; i < 100; i++)
+            {
+                ForwardMCV sudoku = ForwardMCV.FromString(sud);
+
+                Stopwatch stopwatch = Stopwatch.StartNew();
+
+                List<(int, int)> doms = sudoku.GetSortedDomains();
+
+                stopwatch.Start();
+                sudoku.SolveSudokuMCV(doms);
+                stopwatch.Stop();
+
+                Console.WriteLine($"Iteration: {i}, time taken: {stopwatch.ElapsedMilliseconds}ms or {stopwatch.ElapsedTicks}ts");
+
+
+                List<KeyValuePair<string, object>> newRowData = new()
+                {
+
+                    new KeyValuePair<string, object>("timeTakenMs", stopwatch.ElapsedMilliseconds),
+                    new KeyValuePair<string, object>("timeTakenTicks", stopwatch.ElapsedTicks),
+                };
+
+                dataframe.Append(newRowData, inPlace: true);
+            }
+
+            DataFrame.SaveCsv(dataframe, $"ResultMCVSudoku5.csv", ';');*/
+
             Console.WriteLine("Hi, I am your Sudoku Solver Assistant! Please input your sudoku, make sure the numbers are seperated by spaces and there are no spaces in front or after the string: ");
             string sudoku = Console.ReadLine();
 
@@ -50,7 +93,7 @@ namespace SudokuVersie2
                 }
             }
             while (keyinfo.Key != ConsoleKey.X);
-
+            
         }
 
         static void ForwardCheckingAction(ForwardChecking sud) {

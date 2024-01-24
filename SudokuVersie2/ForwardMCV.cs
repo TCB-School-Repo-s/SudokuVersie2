@@ -43,7 +43,7 @@ namespace SudokuVersie2
                     }
                 }
             }
-            solver.Print();
+            //solver.Print();
 
             return solver;
         }
@@ -191,7 +191,7 @@ namespace SudokuVersie2
             row = doms[0].Item1;
             col = doms[0].Item2;
            
-            Console.WriteLine($"{row}, {col}");
+            //Console.WriteLine($"{row}, {col}");
 
             foreach(int num in puzzle[row, col].Domain.ToList())
             {

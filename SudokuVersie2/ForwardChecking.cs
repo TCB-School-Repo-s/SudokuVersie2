@@ -43,7 +43,7 @@ namespace SudokuVersie2
                     }
                 }
             }
-            solver.Print();
+           // solver.Print();
 
             return solver;
         }
